@@ -1,7 +1,10 @@
 import { TrainingPackCard } from "@/components/TrainingPackCard";
 import { Button } from "@/components/ui/button";
-import { Search, Zap } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Search, Zap, X, Filter } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.jpg";
+import { useState, useMemo } from "react";
 
 const trainingPacks = [
   {
@@ -55,6 +58,69 @@ const trainingPacks = [
 ];
 
 const Index = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState<string[]>([]);
+
+  // Get unique difficulties and types
+  const difficulties = useMemo(
+    () => [...new Set(trainingPacks.map((pack) => pack.difficulty))],
+    []
+  );
+  const types = useMemo(
+    () => [...new Set(trainingPacks.map((pack) => pack.type))],
+    []
+  );
+
+  // Filter packs based on search and filters
+  const filteredPacks = useMemo(() => {
+    return trainingPacks.filter((pack) => {
+      // Search filter
+      const matchesSearch =
+        searchQuery === "" ||
+        pack.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        pack.creator.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        pack.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        pack.code.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Difficulty filter
+      const matchesDifficulty =
+        selectedDifficulty.length === 0 ||
+        selectedDifficulty.includes(pack.difficulty);
+
+      // Type filter
+      const matchesType =
+        selectedType.length === 0 || selectedType.includes(pack.type);
+
+      return matchesSearch && matchesDifficulty && matchesType;
+    });
+  }, [searchQuery, selectedDifficulty, selectedType]);
+
+  const toggleDifficulty = (difficulty: string) => {
+    setSelectedDifficulty((prev) =>
+      prev.includes(difficulty)
+        ? prev.filter((d) => d !== difficulty)
+        : [...prev, difficulty]
+    );
+  };
+
+  const toggleType = (type: string) => {
+    setSelectedType((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  };
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedDifficulty([]);
+    setSelectedType([]);
+  };
+
+  const hasActiveFilters =
+    searchQuery !== "" ||
+    selectedDifficulty.length > 0 ||
+    selectedType.length > 0;
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -113,10 +179,106 @@ const Index = () => {
             </p>
           </div>
 
+          {/* Search and Filters */}
+          <div className="max-w-4xl mx-auto space-y-6">
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search by name, creator, code, or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-10 h-12 bg-card border-border text-foreground"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              )}
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex flex-wrap gap-4 items-center">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Filter className="h-4 w-4" />
+                Filters:
+              </div>
+
+              {/* Difficulty Filters */}
+              <div className="flex flex-wrap gap-2">
+                {difficulties.map((difficulty) => (
+                  <Badge
+                    key={difficulty}
+                    variant={
+                      selectedDifficulty.includes(difficulty)
+                        ? "default"
+                        : "outline"
+                    }
+                    className="cursor-pointer hover:bg-primary/20 transition-colors"
+                    onClick={() => toggleDifficulty(difficulty)}
+                  >
+                    {difficulty}
+                  </Badge>
+                ))}
+              </div>
+
+              {/* Type Filters */}
+              <div className="flex flex-wrap gap-2">
+                {types.map((type) => (
+                  <Badge
+                    key={type}
+                    variant={
+                      selectedType.includes(type) ? "default" : "outline"
+                    }
+                    className="cursor-pointer hover:bg-secondary/20 transition-colors border-secondary/50"
+                    onClick={() => toggleType(type)}
+                  >
+                    {type}
+                  </Badge>
+                ))}
+              </div>
+
+              {/* Clear Filters */}
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Clear all
+                </Button>
+              )}
+            </div>
+
+            {/* Results Count */}
+            <div className="text-center text-sm text-muted-foreground">
+              Showing {filteredPacks.length} of {trainingPacks.length} training
+              packs
+            </div>
+          </div>
+
+          {/* Training Packs Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trainingPacks.map((pack, index) => (
-              <TrainingPackCard key={index} {...pack} />
-            ))}
+            {filteredPacks.length > 0 ? (
+              filteredPacks.map((pack, index) => (
+                <TrainingPackCard key={index} {...pack} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-xl text-muted-foreground mb-2">
+                  No training packs found
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Try adjusting your search or filters
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>
