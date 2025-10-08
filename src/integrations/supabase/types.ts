@@ -14,7 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      training_packs: {
+        Row: {
+          code: string
+          created_at: string
+          creator: string
+          description: string
+          difficulty: string
+          id: string
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          creator: string
+          description: string
+          difficulty: string
+          id?: string
+          name: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          creator?: string
+          description?: string
+          difficulty?: string
+          id?: string
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
