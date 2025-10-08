@@ -5,71 +5,36 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Zap, X, Filter } from "lucide-react";
 import heroBanner from "@/assets/hero-banner.jpg";
 import { useState, useMemo } from "react";
-
-const trainingPacks = [
-  {
-    name: "Aerial Mastery",
-    creator: "SunlessKhan",
-    code: "8D93-C997-0C7E-62B4",
-    difficulty: "Advanced" as const,
-    type: "Aerials",
-    description: "Master aerial car control and boost management with progressive difficulty shots",
-  },
-  {
-    name: "Wall-to-Air Dribble",
-    creator: "Poquito",
-    code: "9F6D-4387-4C57-2E4B",
-    difficulty: "Expert" as const,
-    type: "Dribbling",
-    description: "Learn to carry the ball from the wall into the air and score incredible goals",
-  },
-  {
-    name: "Ground Shots Pro",
-    creator: "Wayprotein",
-    code: "6EB1-79B2-33B8-681C",
-    difficulty: "Intermediate" as const,
-    type: "Shooting",
-    description: "Improve your ground shot accuracy and power with varied angles and positions",
-  },
-  {
-    name: "Defensive Positioning",
-    creator: "Kevpert",
-    code: "5A65-4073-F15B-6D87",
-    difficulty: "Beginner" as const,
-    type: "Defense",
-    description: "Practice proper defensive rotations and save positioning fundamentals",
-  },
-  {
-    name: "Flip Reset Fundamentals",
-    creator: "CBell",
-    code: "3F0D-28C2-7C05-D494",
-    difficulty: "Expert" as const,
-    type: "Mechanics",
-    description: "Master the art of flip resets with controlled practice scenarios",
-  },
-  {
-    name: "Speed Flip Training",
-    creator: "Musty",
-    code: "A503-264C-A7EB-D282",
-    difficulty: "Advanced" as const,
-    type: "Mechanics",
-    description: "Perfect your speed flip kickoff technique for competitive advantage",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState<string[]>([]);
 
+  // Fetch training packs from database
+  const { data: trainingPacks = [], isLoading } = useQuery({
+    queryKey: ["training-packs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("training_packs")
+        .select("*")
+        .order("created_at", { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Get unique difficulties and types
   const difficulties = useMemo(
     () => [...new Set(trainingPacks.map((pack) => pack.difficulty))],
-    []
+    [trainingPacks]
   );
   const types = useMemo(
     () => [...new Set(trainingPacks.map((pack) => pack.type))],
-    []
+    [trainingPacks]
   );
 
   // Filter packs based on search and filters
@@ -265,9 +230,13 @@ const Index = () => {
 
           {/* Training Packs Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPacks.length > 0 ? (
-              filteredPacks.map((pack, index) => (
-                <TrainingPackCard key={index} {...pack} />
+            {isLoading ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-xl text-muted-foreground">Loading training packs...</p>
+              </div>
+            ) : filteredPacks.length > 0 ? (
+              filteredPacks.map((pack) => (
+                <TrainingPackCard key={pack.id} {...pack} />
               ))
             ) : (
               <div className="col-span-full text-center py-12">

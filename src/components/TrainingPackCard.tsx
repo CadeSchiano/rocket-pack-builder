@@ -9,7 +9,7 @@ interface TrainingPackCardProps {
   name: string;
   creator: string;
   code: string;
-  difficulty: "Beginner" | "Intermediate" | "Advanced" | "Expert";
+  difficulty: string;
   type: string;
   description: string;
 }
@@ -51,7 +51,7 @@ export const TrainingPackCard = ({
             </h3>
             <p className="text-sm text-muted-foreground">by {creator}</p>
           </div>
-          <Badge className={difficultyColors[difficulty]}>{difficulty}</Badge>
+          <Badge className={difficultyColors[difficulty as keyof typeof difficultyColors] || "bg-muted text-muted-foreground"}>{difficulty}</Badge>
         </div>
 
         <div className="flex items-center gap-2">
