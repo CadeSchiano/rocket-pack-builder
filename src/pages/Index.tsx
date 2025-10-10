@@ -1,4 +1,5 @@
 import { TrainingPackCard } from "@/components/TrainingPackCard";
+import { SubmitPackDialog } from "@/components/SubmitPackDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -124,9 +125,11 @@ const Index = () => {
                 <Search className="mr-2 h-5 w-5" />
                 Browse All Packs
               </Button>
-              <Button size="lg" variant="outline" className="border-secondary text-secondary hover:bg-secondary/10">
-                Submit Your Pack
-              </Button>
+              <SubmitPackDialog>
+                <Button size="lg" variant="outline" className="border-secondary text-secondary hover:bg-secondary/10">
+                  Submit Your Pack
+                </Button>
+              </SubmitPackDialog>
             </div>
           </div>
         </div>
