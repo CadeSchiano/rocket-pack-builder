@@ -2,10 +2,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Copy, Check } from "lucide-react";
-import { useState } from "react";
-import { toast } from "@/hooks/use-toast";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { PackRating } from "./PackRating";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TrainingPackCardProps {
+  id: string;
   name: string;
   creator: string;
   code: string;
@@ -19,9 +22,11 @@ const difficultyColors = {
   Intermediate: "bg-blue-500/20 text-blue-300 border-blue-500/50",
   Advanced: "bg-orange-500/20 text-orange-300 border-orange-500/50",
   Expert: "bg-red-500/20 text-red-300 border-red-500/50",
+  Pro: "bg-red-500/20 text-red-300 border-red-500/50",
 };
 
 export const TrainingPackCard = ({
+  id,
   name,
   creator,
   code,
@@ -30,6 +35,22 @@ export const TrainingPackCard = ({
   description,
 }: TrainingPackCardProps) => {
   const [copied, setCopied] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUserId(session?.user.id || null);
+    };
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUserId(session?.user.id || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -50,6 +71,9 @@ export const TrainingPackCard = ({
               {name}
             </h3>
             <p className="text-sm text-muted-foreground">by {creator}</p>
+            <div className="mt-2">
+              <PackRating packId={id} userId={userId} />
+            </div>
           </div>
           <Badge className={difficultyColors[difficulty as keyof typeof difficultyColors] || "bg-muted text-muted-foreground"}>{difficulty}</Badge>
         </div>
