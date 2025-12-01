@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,8 +30,10 @@ interface SubmitPackDialogProps {
 }
 
 export function SubmitPackDialog({ children }: SubmitPackDialogProps) {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -43,9 +46,40 @@ export function SubmitPackDialog({ children }: SubmitPackDialogProps) {
     description: "",
   });
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUserId(session?.user.id || null);
+    };
+    checkAuth();
+  }, []);
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen && !userId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to submit a training pack",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+    setOpen(newOpen);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!userId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to submit a pack",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
     // Validation
     if (!formData.name || !formData.creator || !formData.code || !formData.difficulty || !formData.type || !formData.description) {
       toast({
@@ -67,14 +101,16 @@ export function SubmitPackDialog({ children }: SubmitPackDialogProps) {
           difficulty: formData.difficulty,
           type: formData.type,
           description: formData.description.trim(),
+          submitted_by: userId,
+          status: 'pending',
         },
       ]);
 
       if (error) throw error;
 
       toast({
-        title: "Success!",
-        description: "Your training pack has been submitted successfully.",
+        title: "Submitted for review!",
+        description: "Your training pack will be reviewed by admins before appearing on the site.",
       });
 
       // Reset form and close dialog
@@ -103,7 +139,7 @@ export function SubmitPackDialog({ children }: SubmitPackDialogProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
