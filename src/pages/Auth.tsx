@@ -8,6 +8,18 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().trim().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+const signupSchema = z.object({
+  email: z.string().trim().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  displayName: z.string().trim().min(1, "Display name is required").max(50, "Display name must be less than 50 characters"),
+});
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -38,12 +50,23 @@ const Auth = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const validation = loginSchema.safeParse({
+      email: loginEmail,
+      password: loginPassword,
+    });
+    
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
+      return;
+    }
+    
     setLoading(true);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: loginPassword,
+        email: validation.data.email,
+        password: validation.data.password,
       });
 
       if (error) throw error;
@@ -57,16 +80,28 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const validation = signupSchema.safeParse({
+      email: signupEmail,
+      password: signupPassword,
+      displayName: signupDisplayName,
+    });
+    
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
+      return;
+    }
+    
     setLoading(true);
 
     try {
       const { error } = await supabase.auth.signUp({
-        email: signupEmail,
-        password: signupPassword,
+        email: validation.data.email,
+        password: validation.data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
-            display_name: signupDisplayName,
+            display_name: validation.data.displayName,
           },
         },
       });
