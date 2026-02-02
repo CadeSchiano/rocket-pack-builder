@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/267ad7ca-514a-4d9d-9f2b-4bcb4b0145b0
+**URL**: https://rocketleague-trainingpacks.lovable.app
 
 ## How can I edit this code?
 
