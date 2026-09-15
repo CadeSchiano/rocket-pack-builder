@@ -328,6 +328,11 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Ad Banner - Below Training Packs */}
+      <section className="container mx-auto px-4 pb-8">
+        <AdBanner slot="4879912226" />
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-border py-8 mt-16">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
