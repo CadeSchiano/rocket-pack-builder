@@ -1,5 +1,6 @@
 import { TrainingPackCard } from "@/components/TrainingPackCard";
 import { SubmitPackDialog } from "@/components/SubmitPackDialog";
+import AdBanner from "@/components/AdBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
