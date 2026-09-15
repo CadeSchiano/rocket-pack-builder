@@ -1,5 +1,6 @@
 import { TrainingPackCard } from "@/components/TrainingPackCard";
 import { SubmitPackDialog } from "@/components/SubmitPackDialog";
+import AdBanner from "@/components/AdBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -325,6 +326,11 @@ const Index = () => {
             )}
           </div>
         </div>
+      </section>
+
+      {/* Ad Banner - Below Training Packs */}
+      <section className="container mx-auto px-4 pb-8">
+        <AdBanner slot="4879912226" />
       </section>
 
       {/* Footer */}
