@@ -89,6 +89,8 @@ export const PackRating = ({ packId, userId }: PackRatingProps) => {
             onMouseEnter={() => setHoveredRating(star)}
             onMouseLeave={() => setHoveredRating(0)}
             disabled={!userId || rateMutation.isPending}
+            title={userId ? `Rate ${star} star${star === 1 ? "" : "s"}` : "Sign in to rate this pack"}
+            aria-label={userId ? `Rate ${star} star${star === 1 ? "" : "s"}` : "Sign in to rate this pack"}
             className="transition-transform hover:scale-110 disabled:cursor-not-allowed"
           >
             <Star
