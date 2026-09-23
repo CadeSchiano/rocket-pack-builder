@@ -102,7 +102,7 @@ const Index = () => {
 
       return matchesSearch && matchesDifficulty && matchesType;
     });
-  }, [searchQuery, selectedDifficulty, selectedType]);
+  }, [trainingPacks, searchQuery, selectedDifficulty, selectedType]);
 
   const toggleDifficulty = (difficulty: string) => {
     setSelectedDifficulty((prev) =>

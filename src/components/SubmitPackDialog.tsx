@@ -47,19 +47,22 @@ export function SubmitPackDialog({ children }: SubmitPackDialogProps) {
   });
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUserId(session?.user.id || null);
-    };
-    checkAuth();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUserId(session?.user?.id || null);
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id || null);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen && !userId) {
       toast({
-        title: "Authentication required",
-        description: "Please sign in to submit a training pack",
-        variant: "destructive",
+        title: "Sign in to submit a pack",
+        description: "Browsing is open to everyone — you just need an account to publish a pack.",
       });
       navigate("/auth");
       return;
