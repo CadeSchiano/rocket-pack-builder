@@ -15,7 +15,7 @@ export const PackRating = ({ packId, userId }: PackRatingProps) => {
 
   // Fetch average rating and user's rating
   const { data: ratings } = useQuery({
-    queryKey: ["pack-ratings", packId],
+    queryKey: ["pack-ratings", packId, userId],
     queryFn: async () => {
       const [avgResult, userResult] = await Promise.all([
         supabase
@@ -66,6 +66,7 @@ export const PackRating = ({ packId, userId }: PackRatingProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pack-ratings", packId] });
+    },
       toast.success("Rating submitted!");
     },
     onError: (error: any) => {
