@@ -66,7 +66,6 @@ export const PackRating = ({ packId, userId }: PackRatingProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pack-ratings", packId] });
-    },
       toast.success("Rating submitted!");
     },
     onError: (error: any) => {
