@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791334012635,
+      "tag": "0000_require_pending_pack_submissions",
+      "breakpoints": true
+    }
+  ]
+}

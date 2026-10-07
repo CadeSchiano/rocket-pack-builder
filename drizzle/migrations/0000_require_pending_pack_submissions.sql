@@ -1,0 +1,1 @@
+ALTER POLICY "Authenticated users can insert packs" ON public.training_packs WITH CHECK ((auth.uid() IS NOT NULL) AND (submitted_by = auth.uid()) AND (status = 'pending'::public.pack_status));
