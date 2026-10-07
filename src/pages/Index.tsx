@@ -63,6 +63,7 @@ const Index = () => {
       const { data, error } = await supabase
         .from("training_packs")
         .select("*")
+        .eq("status", "approved")
         .order("created_at", { ascending: false });
       
       if (error) throw error;
